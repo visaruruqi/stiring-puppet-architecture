@@ -19,22 +19,22 @@ class RegisterFormPresenter {
                 submitRegisterForm: action
             });
 
-        reaction(() => repository.pm, pm => {
-            console.log("Rock pm changed:", pm);
-            this.viewModel = {
-                ...this.viewModel,
-                ...{
-                    name: pm.name,
-                    email: pm.email
-                },
+        reaction(
+            () => [repository.pm.name, repository.pm.email], // Reacts when `repository.pm.name` or `repository.pm.email` changes
+            ([name, email]) => { // Called with the new values
+                console.log("** Presenter ** pm name or email changed:", name, email);
+
+                this.viewModel.name = name;
+                this.viewModel.email = email;
             }
-        })
+        );
 
-        reaction(() => repository.groups, groups => {
-            console.log("Rock groups changed:", groups);
+        reaction(() => repository.groups.slice(),
+            groups => {
+                console.log("** Presenter ** groups changed:", groups);
+                this.viewModel.groups = groups;
 
-            this.viewModel = {...this.viewModel, ...{groups}};
-        })
+            })
 
     }
 

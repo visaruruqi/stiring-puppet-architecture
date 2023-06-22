@@ -19,7 +19,8 @@ class RegisterRepository {
 
     async load() {
         const dto = await gateway.get();
-        this.pm = {name: dto.result.name, email: dto.result.email}
+        this.pm.name = dto.result.name;
+        this.pm.email = dto.result.email;
     }
 
     async submit(obj) {
@@ -38,14 +39,12 @@ class RegisterRepository {
     }
 
     changeModel(name, email) {
-        this.pm = {
-            ...this.pm,
-            ...{name, email}
-        }
+        this.pm.name = name;
+        this.pm.email = email;
     }
 
     addGroup(timestamp) {
-        this.groups = [...this.groups,...[timestamp]]
+        this.groups.push(timestamp);
     }
 }
 

@@ -44,10 +44,29 @@ export default {
     }
   },
   mounted() {
-    reaction(()=>presenter.viewModel,viewModel => {
+    /*reaction(()=>presenter.viewModel,viewModel => {
       console.log("Howdy from VUE", viewModel);
       this.vm = {...viewModel}
-    })
+    })*/
+
+    reaction(
+        () => [presenter.viewModel.name, presenter.viewModel.email], // Reacts when `repository.pm.name` or `repository.pm.email` changes
+        ([name, email]) => { // Called with the new values
+          console.log("********* pm name or email changed:", name, email);
+
+          this.vm.name = name;
+          this.vm.email = email;
+        }
+    );
+
+    reaction(
+        () => [presenter.viewModel.groups], // Reacts when `repository.pm.name` or `repository.pm.email` changes
+        ([groups]) => { // Called with the new values
+          console.log("********* groups changed:", groups);
+
+          this.vm.groups = groups;
+        }
+    );
 
     presenter.load()
   },
