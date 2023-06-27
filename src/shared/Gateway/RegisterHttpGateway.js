@@ -1,4 +1,8 @@
-class RegisterHttpGateway {
+import "reflect-metadata";
+import {injectable} from "inversify";
+
+@injectable()
+export default class RegisterHttpGateway {
     dto = {name: "Visar Uruqi", email: "visar@hotelkeyapp.com"}
 
     async get() {
@@ -17,6 +21,4 @@ class RegisterHttpGateway {
         }
     }
 }
-
-export const gateway = new RegisterHttpGateway()
 

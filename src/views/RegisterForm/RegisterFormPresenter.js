@@ -1,13 +1,20 @@
-import {repository} from "@/shared/Repository/RegisterRepository";
-import {action, makeObservable, observable, reaction} from "mobx";
+import "reflect-metadata";
+import {action, computed, makeObservable, observable, reaction} from "mobx";
+// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line no-unused-vars
+import {inject, injectable, postConstruct} from "inversify";
+import {TYPES} from "@/ioc/types";
 
-class RegisterFormPresenter {
+@injectable()
+export default class RegisterFormPresenter {
 
     viewModel = {
         name: null,
         email: null,
         groups: []
     };
+
+    @inject(TYPES.RegisterRepository) repository;
 
     constructor() {
         makeObservable(this,
@@ -16,43 +23,50 @@ class RegisterFormPresenter {
                 load: action,
                 changeData: action,
                 addGroup: action,
-                submitRegisterForm: action
+                submitRegisterForm: action,
+                getLengthOfGroups: computed
             });
+    }
 
+    @postConstruct()
+    init() {
+        // Your initialization code that depends on RegisterRepository can be placed here
+        console.log('Post-construction code');
         reaction(
-            () => [repository.pm.name, repository.pm.email], // Reacts when `repository.pm.name` or `repository.pm.email` changes
+            () => [this.repository.pm.name, this.repository.pm.email], // Reacts when `repository.pm.name` or `repository.pm.email` changes
             ([name, email]) => { // Called with the new values
-                console.log("** Presenter ** pm name or email changed:", name, email);
+                //console.log("** Presenter ** pm name or email changed:", name, email);
 
                 this.viewModel.name = name;
                 this.viewModel.email = email;
             }
         );
 
-        reaction(() => repository.groups.slice(),
+        reaction(() => this.repository.groups.slice(),
             groups => {
-                console.log("** Presenter ** groups changed:", groups);
+                //console.log("** Presenter ** groups changed:", groups);
                 this.viewModel.groups = groups;
 
             })
+    }
 
+    get getLengthOfGroups(){
+        return this.viewModel.groups.length;
     }
 
     async load() {
-        await repository.load();
+        await this.repository.load();
     }
 
     changeData(name, email) {
-        repository.changeModel(name, email)
+        this.repository.changeModel(name, email)
     }
 
     addGroup(timestamp) {
-        repository.addGroup(timestamp);
+        this.repository.addGroup(timestamp);
     }
 
     async submitRegisterForm(newData) {
-        await repository.submit(newData);
+        await this.repository.submit(newData);
     }
 }
-
-export default RegisterFormPresenter;

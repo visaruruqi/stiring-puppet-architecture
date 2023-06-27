@@ -11,7 +11,7 @@
         <input type="email" id="email" v-model="vm.email">
       </div>
       <div>
-        {{vm.groups}}
+        {{presenter.getLengthOfGroups}}
       </div>
       <div>
         <button @click="loadData" type="button">Get Data</button>
@@ -26,16 +26,16 @@
 </template>
 
 <script>
-import RegisterFormPresenter from "@/views/RegisterForm/RegisterFormPresenter";
 import {reaction} from "mobx";
+import {observer} from "mobx-vue";
+import {container} from "@/ioc/ioc";
+import {TYPES} from "@/ioc/types";
 
-const presenter = new RegisterFormPresenter();
-
-export default {
+export default observer({
   name: "RegisterForm",
   data() {
     return {
-      presenter: null,
+      presenter: container.get(TYPES.RegisterPresenter),
       vm: {
         name: null,
         email: null,
@@ -44,15 +44,11 @@ export default {
     }
   },
   mounted() {
-    /*reaction(()=>presenter.viewModel,viewModel => {
-      console.log("Howdy from VUE", viewModel);
-      this.vm = {...viewModel}
-    })*/
 
     reaction(
-        () => [presenter.viewModel.name, presenter.viewModel.email], // Reacts when `repository.pm.name` or `repository.pm.email` changes
+        () => [this.presenter.viewModel.name, this.presenter.viewModel.email], // Reacts when `repository.pm.name` or `repository.pm.email` changes
         ([name, email]) => { // Called with the new values
-          console.log("********* pm name or email changed:", name, email);
+          //console.log("********* pm name or email changed:", name, email);
 
           this.vm.name = name;
           this.vm.email = email;
@@ -60,35 +56,35 @@ export default {
     );
 
     reaction(
-        () => [presenter.viewModel.groups], // Reacts when `repository.pm.name` or `repository.pm.email` changes
+        () => [this.presenter.viewModel.groups], // Reacts when `repository.pm.name` or `repository.pm.email` changes
         ([groups]) => { // Called with the new values
-          console.log("********* groups changed:", groups);
+          //console.log("********* groups changed:", groups);
 
           this.vm.groups = groups;
         }
     );
 
-    presenter.load()
+    this.presenter.load()
   },
   methods: {
     loadData() {
-      presenter.load();
+      this.presenter.load();
     },
     submitForm() {
-      presenter.submitRegisterForm({
+      this.presenter.submitRegisterForm({
         name: this.vm.name,
         email: this.vm.email
       })
     },
     changeModelInRepository() {
-      presenter.changeData("John Doe", "john@hotelkeyapp.com")
+      this.presenter.changeData("John Doe", "john@hotelkeyapp.com")
     },
     addGroup() {
-      presenter.addGroup(Date.now())
+      this.presenter.addGroup(Date.now())
     }
 
   },
-}
+})
 </script>
 
 <style scoped>
